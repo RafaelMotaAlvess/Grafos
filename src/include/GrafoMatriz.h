@@ -3,15 +3,40 @@
 
 #include "Grafos.h"
 
+#include <iomanip>
+#include <sstream>
+
 class GrafoMatriz : public Grafos {
+    vector<vector<float>> matrizAdjacencia;
+    vector<string> labels;
 public:
+    GrafoMatriz(bool isDirecionado = false, bool isPonderado = false) {
+        this->isDirecionado = isDirecionado;
+        this->isPonderado = isPonderado;
+    }
+
     bool adicionarVertice(string label) override {
-        cout << "Adicionando vertice no GrafoMatriz" << endl;
+        labels.push_back(label);
+        int novoTamanho = matrizAdjacencia.size() + 1;
+
+        // Adiciona uma nova linha com zeros
+        matrizAdjacencia.push_back(vector<float>(novoTamanho, 0.0));
+
+        // Adiciona uma nova coluna com zeros em todas as linhas existentes
+        for (int i = 0; i < novoTamanho - 1; i++) {
+            matrizAdjacencia[i].push_back(0.0);
+        }
+
         return true;
     }
 
     bool adicionarAresta(int origem, int destino, float peso = 1.0) override {
-        cout << "Adicionando aresta no GrafoMatriz" << endl;
+        if(this->isDirecionado){
+            matrizAdjacencia[origem][destino] = peso;
+        } else {
+            matrizAdjacencia[origem][destino] = peso;
+            matrizAdjacencia[destino][origem] = peso;
+        }
         return true;
     }
 
@@ -31,7 +56,35 @@ public:
     }
 
     void imprimirGrafo() override {
-        cout << "Imprimindo GrafoMatriz" << endl;
+        cout << "Matriz de Adjacência:" << endl;
+
+        int n = matrizAdjacencia.size();
+
+        size_t largura = 0;
+        for (int i = 0; i < n; i++) {
+            largura = max(largura, labels[i].size());
+            for (int j = 0; j < n; j++) {
+                std::stringstream ss;
+                ss << matrizAdjacencia[i][j];
+                largura = max(largura, ss.str().size());
+            }
+        }
+
+        largura += 2;
+
+        cout << setw(largura) << " ";
+        for (int j = 0; j < n; j++) {
+            cout << setw(largura) << labels[j];
+        }
+        cout << endl;
+
+        for (int i = 0; i < n; i++) {
+            cout << setw(largura) << labels[i];
+            for (int j = 0; j < n; j++) {
+                cout << setw(largura) << matrizAdjacencia[i][j];
+            }
+            cout << endl;
+        }
     }
 
     bool existeAresta(int origem, int destino) override {
@@ -40,8 +93,7 @@ public:
     }
 
     float pesoAresta(int origem, int destino) override {
-        cout << "Retornando peso da aresta no GrafoMatriz" << endl;
-        return 1.0;
+        return matrizAdjacencia[origem][destino];
     }
 
     vector<int> retornarVizinhos(int vertice) override {
@@ -56,9 +108,6 @@ public:
     void dfs() override {
         cout << "Executando DFS no GrafoMatriz" << endl;
     }
-
-private:
-    // futura estrutura de matriz de adjacência
 };
 
 #endif
