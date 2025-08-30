@@ -1,20 +1,47 @@
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 #include "./include/GrafoLista.h"
 #include "./include/GrafoMatriz.h"
+#include "./include/LeitorGrafo.h"
 
 using namespace std;
 
-
 int main(int argc, char** argv) {
-	GrafoLista grafoLista;
-	GrafoMatriz grafoMatriz;
+    LeitorGrafo leitor("filename.txt");
 
-	grafoLista.adicionarVertice("A");
-	grafoLista.adicionarAresta(0, 1);
+    if (!leitor.carregarArquivo()) {
+        cout << "Falha ao carregar o grafo!" << endl;
+        return 1;
+    }
 
-	grafoMatriz.adicionarVertice("B");
-	grafoMatriz.adicionarAresta(0, 1);
+    GrafoMatriz grafo(leitor.getIsDirecionado(), leitor.getIsPonderado());
 
-	return 0;
+    // adiciona vértices
+    for (int i = 0; i < leitor.getVertices(); i++) {
+				char letra = 'A' + i;
+        grafo.adicionarVertice(string(1, letra));
+    }
+
+    // pega as linhas das arestas
+    vector<vector<string>> dados = leitor.getDados();
+
+
+		// a nomeclaruta é a mesma do arquivo do Lyra (TG02 - Conceitos Básicos)
+    for (auto &linha : dados) {
+        int Ao = stoi(linha[0]);  // origem
+        int Ad = stoi(linha[1]);  // destino
+
+        float Ap = 1.0;
+        if (leitor.getIsPonderado() && linha.size() >= 3) {
+            Ap = stof(linha[2]); // peso
+        }
+
+        grafo.adicionarAresta(Ao, Ad, Ap);
+    }
+
+    grafo.imprimirGrafo();
+
+    return 0;
 }
