@@ -51,12 +51,17 @@ public:
 
         // Remove o label do vertice
         labels.erase(labels.begin() + index);
-        
+
         return true;
     }
 
     bool removerAresta(int origem, int destino) override {
-        cout << "Removendo aresta no GrafoMatriz" << endl;
+        if(this->isDirecionado){
+            matrizAdjacencia[origem][destino] = 0.0;
+        } else {
+            matrizAdjacencia[origem][destino] = 0.0;
+            matrizAdjacencia[destino][origem] = 0.0;
+        }
         return true;
     }
 
