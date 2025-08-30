@@ -41,6 +41,8 @@ int main(int argc, char** argv) {
         grafo.adicionarAresta(Ao, Ad, Ap);
     }
 
+    grafo.removerVertice(2); // remove o vertice C (índice 2) a
+
     grafo.imprimirGrafo();
 
     return 0;

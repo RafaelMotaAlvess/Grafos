@@ -64,7 +64,7 @@ GrafoMatriz (`src/include/GrafoMatriz.h`)
 - [x] `adicionarAresta(origem, destino, peso)` – respeita direcionado/não direcionado
 - [x] `imprimirGrafo()` – imprime matriz com labels e largura ajustada
 - [x] `pesoAresta(origem, destino)` – retorna valor da matriz
-- [ ] `removerVertice(index)` – remover linha/coluna e label correspondente
+- [x] `removerVertice(index)` – remover linha/coluna e label correspondente
 - [ ] `removerAresta(origem, destino)` – zerar entrada (e simétrica se não direcionado)
 - [ ] `labelVertice(index)` – retornar label correto (hoje retorna placeholder)
 - [ ] `existeAresta(origem, destino)` – verificar > 0 (ou diferente de "ausência"/∞)

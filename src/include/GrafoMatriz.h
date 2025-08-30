@@ -41,7 +41,17 @@ public:
     }
 
     bool removerVertice(int index) override {
-        cout << "Removendo vertice no GrafoMatriz" << endl;
+        // Remove a linha de um vertice
+        matrizAdjacencia.erase(matrizAdjacencia.begin() + index);
+
+        // Remove a coluna de um vertice
+        for (auto& row : matrizAdjacencia) {
+            row.erase(row.begin() + index);
+        }
+
+        // Remove o label do vertice
+        labels.erase(labels.begin() + index);
+        
         return true;
     }
 
