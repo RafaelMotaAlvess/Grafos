@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
 
     // grafo.removerVertice(2); // remove o vertice C (índice 2) a
     grafo.removerAresta(0, 2); // remove a aresta A-D
+    cout << "grafo label vertice: " <<  grafo.labelVertice(2) << endl;
 
     grafo.imprimirGrafo();
 

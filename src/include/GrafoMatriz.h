@@ -66,8 +66,7 @@ public:
     }
 
     string labelVertice(int index) override {
-        cout << "Retornando label do vertice no GrafoMatriz" << endl;
-        return "A";
+        return this->labels.at(index);
     }
 
     void imprimirGrafo() override {
