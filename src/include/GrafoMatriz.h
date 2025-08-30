@@ -102,8 +102,11 @@ public:
     }
 
     bool existeAresta(int origem, int destino) override {
-        cout << "Verificando se existe aresta no GrafoMatriz" << endl;
-        return true;
+        if(matrizAdjacencia[origem][destino] != 0.0){
+            return true;
+        }
+
+        return false;
     }
 
     float pesoAresta(int origem, int destino) override {

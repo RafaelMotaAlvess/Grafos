@@ -45,6 +45,12 @@ int main(int argc, char** argv) {
     grafo.removerAresta(0, 2); // remove a aresta A-D
     cout << "grafo label vertice: " <<  grafo.labelVertice(2) << endl;
 
+
+    cout << "Aresta entre 0 e 2 existe? " << (grafo.existeAresta(0, 2) ? "Sim" : "Nao") << endl;
+    cout << "Aresta entre 0 e 1 existe? " << (grafo.existeAresta(0, 1) ? "Sim" : "Nao") << endl;
+
+
+
     grafo.imprimirGrafo();
 
     return 0;
