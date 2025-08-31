@@ -5,6 +5,7 @@
 
 #include <iomanip>
 #include <sstream>
+#include <queue>
 
 class GrafoMatriz : public Grafos {
     vector<vector<float>> matrizAdjacencia;
@@ -128,8 +129,27 @@ public:
         return vizinhos;
     }
 
-    void bfs() override {
-        cout << "Executando BFS no GrafoMatriz" << endl;
+    void bfs(int source) override {
+        int tamanhoMatrizAdjacencia = this->matrizAdjacencia.size();
+        vector<bool> visitados(tamanhoMatrizAdjacencia, false);
+
+        int fila[tamanhoMatrizAdjacencia];
+        int front = 0, rear = 0;
+
+        visitados[source] = true;
+        fila[rear++] = source;
+        
+        while(front != rear){ 
+            source = fila[front++];
+            cout << "Source: " << source << " - " << this->labelVertice(source) << endl;
+
+            for(int adjacent = 0; adjacent < tamanhoMatrizAdjacencia; adjacent++){
+                if(this->matrizAdjacencia[source][adjacent] && !visitados[adjacent]){
+                    visitados[adjacent] = true;
+                    fila[rear++] = adjacent;
+                }
+            }   
+        }
     }
 
     void dfs() override {

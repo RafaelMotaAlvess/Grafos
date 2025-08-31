@@ -54,9 +54,9 @@ int main(int argc, char** argv) {
     for (int v : vizinhos) {
         cout << v << " ";
     }
-    //
+    
     cout << endl;
-
+    grafo.bfs(2);
     grafo.imprimirGrafo();
 
     return 0;

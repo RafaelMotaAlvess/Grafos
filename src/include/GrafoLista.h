@@ -49,7 +49,7 @@ public:
         return vector<int>{1, 2, 3};
     }
 
-    void bfs() override {
+    void bfs(int source) override {
         cout << "Executando BFS no GrafoLista" << endl;
     }
 
