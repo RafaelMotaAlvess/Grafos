@@ -17,9 +17,12 @@ Pré‑requisitos: `g++` instalado. O `Makefile` linka `-lGL -lglut` (não utili
 - `make`
 
 2) Executar:
-- `./main`
+- `./main caminho-do-arquivo.txt`
+- Se não informar um caminho, usa `filename.txt` por padrão.
 
-O programa lê automaticamente o arquivo `filename.txt` na raiz do projeto (caminho está hardcoded em `src/main.cpp`). Para usar outro arquivo, altere o caminho em `src/main.cpp:12`.
+Arquivos de exemplo:
+- `filename.txt` (3 vértices)
+- `filename7.txt` (7 vértices)
 
 ## Formato do Arquivo de Entrada
 Primeira linha: `V A D P`
@@ -69,10 +72,10 @@ GrafoMatriz (`src/include/GrafoMatriz.h`)
 - [x] `labelVertice(index)` – retornar label correto (hoje retorna placeholder)
 - [x] `existeAresta(origem, destino)` – verificar > 0 (ou diferente de "ausência"/∞)
 - [x] `retornarVizinhos(vertice)` – índices j com aresta válida a partir de `vertice`
-- [ ] `bfs()` – busca em largura usando a matriz
+- [x] `bfs()` – busca em largura usando a matriz
     - [x] Realizar a busca por BFS
-    - [ ] Trocar a implementação da fila por uma queue do C++ ou implementação própria
-- [ ] `dfs()` – busca em profundidade usando a matriz
+    - [x] Trocar a implementação da fila por uma queue do C++ ou implementação própria
+- [x] `dfs()` – busca em profundidade usando a matriz
 
 GrafoLista (`src/include/GrafoLista.h`)
 - [ ] Estrutura interna (e.g., `vector<vector<pair<int,float>>>` + `labels`)
@@ -88,6 +91,45 @@ GrafoLista (`src/include/GrafoLista.h`)
 - [ ] `bfs()`
 - [ ] `dfs()`
 
-Sugestões rápidas
-- Se não usar OpenGL/GLUT, simplifique o `Makefile` removendo `-lGL -lglut`.
-- Parametrize o caminho do arquivo de entrada via argumento CLI (e.g., `./main arquivo.txt`).
+---
+# Testes BFS e DFS:
+
+### Valores para teste 
+
+```txt
+7 9 1 0
+0 1
+0 2
+1 3
+1 4
+2 4
+3 5
+4 5
+5 6
+2 6
+```
+![alt text](.github/images/image-2.png)
+
+## Grafo Matriz BFS TEST: 
+
+### Teste realizado no [Graph Online](https://graphonline.top/)
+
+#### Começando no vertice 0 ou A
+![alt text](.github/images/image.png)
+> Nosso resultado: A B C D E G F ✅
+
+### Começando no vertice 2 ou C
+![alt text](.github/images/image-1.png)
+> Nosso resultado: C E G F ✅
+
+## Grafo Matriz DFS TEST: 
+
+### Teste realizado no [Graph Online](https://graphonline.top/)
+
+#### Começando no vertice 0 ou A
+![alt text](.github/images/image-3.png)
+> Nosso resultado: A B D F G E C ✅
+
+### Começando no vertice 2 ou C
+![alt text](.github/images/image-4.png)
+> Nosso resultado: C E F G ✅
