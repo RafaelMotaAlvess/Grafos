@@ -113,9 +113,19 @@ public:
         return matrizAdjacencia[origem][destino];
     }
 
+
+    // busca vizinhos em J (ou seja, colunas) para um dado vertice I (linha)
     vector<int> retornarVizinhos(int vertice) override {
-        cout << "Retornando vizinhos do vertice no GrafoMatriz" << endl;
-        return vector<int>{1, 2, 3};
+        vector<int> vizinhos;
+        int n = matrizAdjacencia.size();
+
+        for (int j = 0; j < n; j++) {
+            if (matrizAdjacencia[vertice][j] != 0.0) {
+                vizinhos.push_back(j);
+            }
+        }
+
+        return vizinhos;
     }
 
     void bfs() override {

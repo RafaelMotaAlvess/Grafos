@@ -68,7 +68,7 @@ GrafoMatriz (`src/include/GrafoMatriz.h`)
 - [x] `removerAresta(origem, destino)` – zerar entrada (e simétrica se não direcionado)
 - [x] `labelVertice(index)` – retornar label correto (hoje retorna placeholder)
 - [x] `existeAresta(origem, destino)` – verificar > 0 (ou diferente de "ausência"/∞)
-- [ ] `retornarVizinhos(vertice)` – índices j com aresta válida a partir de `vertice`
+- [x] `retornarVizinhos(vertice)` – índices j com aresta válida a partir de `vertice`
 - [ ] `bfs()` – busca em largura usando a matriz
 - [ ] `dfs()` – busca em profundidade usando a matriz
 

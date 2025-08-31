@@ -42,14 +42,20 @@ int main(int argc, char** argv) {
     }
 
     // grafo.removerVertice(2); // remove o vertice C (índice 2) a
-    grafo.removerAresta(0, 2); // remove a aresta A-D
+    // grafo.removerAresta(0, 2); // remove a aresta A-D
     cout << "grafo label vertice: " <<  grafo.labelVertice(2) << endl;
 
 
     cout << "Aresta entre 0 e 2 existe? " << (grafo.existeAresta(0, 2) ? "Sim" : "Nao") << endl;
     cout << "Aresta entre 0 e 1 existe? " << (grafo.existeAresta(0, 1) ? "Sim" : "Nao") << endl;
 
-
+    vector<int> vizinhos = grafo.retornarVizinhos(0);
+    cout << "Vizinhos do vertice 0: ";
+    for (int v : vizinhos) {
+        cout << v << " ";
+    }
+    //
+    cout << endl;
 
     grafo.imprimirGrafo();
 
