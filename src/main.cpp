@@ -9,7 +9,8 @@
 using namespace std;
 
 int main(int argc, char** argv) {
-    LeitorGrafo leitor("filename.txt");
+    string caminho = (argc >= 2 ? argv[1] : string("filename.txt"));
+    LeitorGrafo leitor(caminho);
 
     if (!leitor.carregarArquivo()) {
         cout << "Falha ao carregar o grafo!" << endl;
@@ -43,6 +44,7 @@ int main(int argc, char** argv) {
 
     // grafo.removerVertice(2); // remove o vertice C (índice 2) a
     // grafo.removerAresta(0, 2); // remove a aresta A-D
+    // 
     cout << "grafo label vertice: " <<  grafo.labelVertice(2) << endl;
 
 
@@ -56,8 +58,10 @@ int main(int argc, char** argv) {
     }
     
     cout << endl;
+    grafo.bfs();
     grafo.bfs(2);
     grafo.imprimirGrafo();
-
+    grafo.dfs();
+    grafo.dfs(2);
     return 0;
 }

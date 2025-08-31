@@ -27,7 +27,10 @@ public:
     virtual vector<int> retornarVizinhos(int vertice) = 0;
 
     virtual void bfs(int source) = 0;
-    virtual void dfs() = 0;
+    virtual void bfs() { bfs(0); }
+
+    virtual void dfs(int source) = 0;
+    virtual void dfs() { dfs(0); }
 };
 
 #endif
