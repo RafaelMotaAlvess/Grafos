@@ -70,6 +70,8 @@ GrafoMatriz (`src/include/GrafoMatriz.h`)
 - [x] `existeAresta(origem, destino)` – verificar > 0 (ou diferente de "ausência"/∞)
 - [x] `retornarVizinhos(vertice)` – índices j com aresta válida a partir de `vertice`
 - [ ] `bfs()` – busca em largura usando a matriz
+ - [x] Realizar a busca por BFS
+ - [x] Trocar a implementação da fila por uma queue do C++ ou implementação própria
 - [ ] `dfs()` – busca em profundidade usando a matriz
 
 GrafoLista (`src/include/GrafoLista.h`)
