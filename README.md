@@ -1,4 +1,6 @@
-# Trabalho M1 – Parte 1 (Grafos)
+# Trabalho M1 – Grafos Lista e Matriz
+
+## Alunos: Rafael Mota Alves e Nilson Andrade Neto
 
 ## Descrição
 - Objetivo: implementar um grafo e as funções básicas de seu funcionamento nas duas representações pedidas: por lista de adjacência e por matriz de adjacência.
@@ -43,53 +45,6 @@ Exemplo (`filename.txt`):
 1 2 7
 2 0 1
 ```
-
-No `main`, os vértices são adicionados com rótulos automáticos `A`, `B`, `C`, …
-
-## Estrutura
-- `src/main.cpp`: orquestra leitura do arquivo e popula o `GrafoMatriz`.
-- `src/include/Grafos.h`: interface base com as operações exigidas.
-- `src/include/GrafoMatriz.h`: implementação por matriz de adjacência.
-- `src/include/GrafoLista.h`: implementação por lista de adjacência (a implementar).
-- `src/include/LeitorGrafo.h`: leitor do arquivo de entrada.
-
-## TODO
-Itens marcados com [x] estão implementados ao menos de forma básica; [ ] pendentes ou apenas com stubs/mocks.
-
-Geral
-- [x] Interface comum `Grafos` com operações básicas
-- [x] Leitor de arquivo (`LeitorGrafo`) com flags direcionado/ponderado
-- [x] População do grafo a partir do arquivo no `main`
-- [x] Impressão da matriz de adjacência (com cabeçalhos)
-
-GrafoMatriz (`src/include/GrafoMatriz.h`)
-- [x] `adicionarVertice(label)` – ajusta matriz e labels
-- [x] `adicionarAresta(origem, destino, peso)` – respeita direcionado/não direcionado
-- [x] `imprimirGrafo()` – imprime matriz com labels e largura ajustada
-- [x] `pesoAresta(origem, destino)` – retorna valor da matriz
-- [x] `removerVertice(index)` – remover linha/coluna e label correspondente
-- [x] `removerAresta(origem, destino)` – zerar entrada (e simétrica se não direcionado)
-- [x] `labelVertice(index)` – retornar label correto (hoje retorna placeholder)
-- [x] `existeAresta(origem, destino)` – verificar > 0 (ou diferente de "ausência"/∞)
-- [x] `retornarVizinhos(vertice)` – índices j com aresta válida a partir de `vertice`
-- [x] `bfs()` – busca em largura usando a matriz
-    - [x] Realizar a busca por BFS
-    - [x] Trocar a implementação da fila por uma queue do C++ ou implementação própria
-- [x] `dfs()` – busca em profundidade usando a matriz
-
-GrafoLista (`src/include/GrafoLista.h`)
-- [ ] Estrutura interna (e.g., `vector<vector<pair<int,float>>>` + `labels`)
-- [ ] `adicionarVertice(label)`
-- [ ] `adicionarAresta(origem, destino, peso)` – respeitar direcionado/ponderado
-- [ ] `removerVertice(index)` – atualizar lista e reindexações necessárias
-- [ ] `removerAresta(origem, destino)`
-- [ ] `labelVertice(index)`
-- [ ] `imprimirGrafo()` – formato legível (lista por vértice)
-- [ ] `existeAresta(origem, destino)`
-- [ ] `pesoAresta(origem, destino)`
-- [ ] `retornarVizinhos(vertice)`
-- [ ] `bfs()`
-- [ ] `dfs()`
 
 ---
 # Testes BFS e DFS:

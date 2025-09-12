@@ -21,66 +21,63 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    cout << "grafo label vertice: " << grafo->labelVertice(2) << endl;
-
-    cout << "Aresta entre 0 e 2 existe? " << (grafo->existeAresta(0, 2) ? " Sim" : " Nao") << endl;
-    cout << "Aresta entre 0 e 1 existe? " << (grafo->existeAresta(0, 1) ? " Sim" : " Nao") << endl;
-
-    vector<int> vizinhos = grafo->retornarVizinhos(0);
-    cout << "Vizinhos do vertice 0: ";
-    for (int v : vizinhos) cout << v << " ";
-    cout << endl;
-
-    grafo->bfs();
-    grafo->bfs(2);
+    cout << "==========================" << endl;
     grafo->imprimirGrafo();
-    grafo->dfs();
-    grafo->dfs(2);
 
-    int origemD = 0;
     int nVerts = grafo->numeroVertices();
+    int origem = 0;
+
     if (argc >= 3) {
         string arg = argv[2];
         try {
-            origemD = stoi(arg);
+            origem = stoi(arg);
         } catch (...) {
             bool found = false;
             for (int i = 0; i < nVerts; ++i) {
-                if (grafo->labelVertice(i) == arg) { origemD = i; found = true; break; }
+                if (grafo->labelVertice(i) == arg) { origem = i; found = true; break; }
             }
-            if (!found) origemD = 0;
+            if (!found) origem = 0;
         }
     } else {
-        cout << "Informe a origem para Dijkstra (indice 0.." << (nVerts-1)
+        cout << "Informe a origem (indice 0.." << (nVerts-1)
              << " ou label A..): [padrao 0] ";
         string entrada;
         if (!(cin >> entrada)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            origemD = 0;
+            origem = 0;
         } else {
             try {
-                origemD = stoi(entrada);
+                origem = stoi(entrada);
             } catch (...) {
                 bool found = false;
                 for (int i = 0; i < nVerts; ++i) {
-                    if (grafo->labelVertice(i) == entrada) { origemD = i; found = true; break; }
+                    if (grafo->labelVertice(i) == entrada) { origem = i; found = true; break; }
                 }
-                
                 if (!found) {
                     cout << "Label desconhecida. Usando origem 0." << endl;
-                    origemD = 0;
+                    origem = 0;
                 }
             }
         }
     }
 
-    if (origemD < 0 || origemD >= nVerts) {
+    if (origem < 0 || origem >= nVerts) {
         cout << "Origem fora do intervalo. Usando 0." << endl;
-        origemD = 0;
+        origem = 0;
     }
 
-    grafo->dijkstra(origemD);
+    cout << "==========================" << endl;
+
+    grafo->bfs(origem);
+
+    cout << "==========================" << endl;
+
+    grafo->dfs(origem);
+
+    cout << "==========================" << endl;
+
+    grafo->dijkstra(origem);
 
     return 0;
 }
