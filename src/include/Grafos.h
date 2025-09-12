@@ -123,9 +123,9 @@ public:
             }
         }
 
-        cout << "Dijkstra a partir de " << labelVertice(source) << " (" << source << ")" << endl;
+        cout << "Dijkstra a partir de " << labelVertice(source) << endl;
         for (int v = 0; v < n; ++v) {
-            cout << "Destino " << labelVertice(v) << " (" << v << ")";
+            cout << "Destino " << labelVertice(v);
             if (dist[v] == INF) {
                 cout << ": dist = INF; caminho: inexistente" << endl;
                 continue;

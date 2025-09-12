@@ -40,20 +40,43 @@ int main(int argc, char** argv) {
     int origemD = 0;
     int nVerts = grafo->numeroVertices();
     if (argc >= 3) {
+        string arg = argv[2];
         try {
-            origemD = stoi(argv[2]);
-        } catch (...) { origemD = 0; }
+            origemD = stoi(arg);
+        } catch (...) {
+            bool found = false;
+            for (int i = 0; i < nVerts; ++i) {
+                if (grafo->labelVertice(i) == arg) { origemD = i; found = true; break; }
+            }
+            if (!found) origemD = 0;
+        }
     } else {
-        cout << "Informe o indice da origem para Dijkstra (0.." << (nVerts-1) << ") [padrao 0]: ";
-        if (!(cin >> origemD)) {
+        cout << "Informe a origem para Dijkstra (indice 0.." << (nVerts-1)
+             << " ou label A..): [padrao 0] ";
+        string entrada;
+        if (!(cin >> entrada)) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
             origemD = 0;
+        } else {
+            try {
+                origemD = stoi(entrada);
+            } catch (...) {
+                bool found = false;
+                for (int i = 0; i < nVerts; ++i) {
+                    if (grafo->labelVertice(i) == entrada) { origemD = i; found = true; break; }
+                }
+                
+                if (!found) {
+                    cout << "Label desconhecida. Usando origem 0." << endl;
+                    origemD = 0;
+                }
+            }
         }
     }
-    
+
     if (origemD < 0 || origemD >= nVerts) {
-        cout << "Indice fora do intervalo. Usando origem 0." << endl;
+        cout << "Origem fora do intervalo. Usando 0." << endl;
         origemD = 0;
     }
 
