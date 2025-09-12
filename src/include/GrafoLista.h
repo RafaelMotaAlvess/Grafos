@@ -19,8 +19,8 @@ struct Aresta {
 };
 
 class GrafoLista : public Grafos {
-    vector<vector<Aresta>> adj;   // lista de adjacência
-    vector<string> labels;        // rótulos/nomes dos vértices
+    vector<vector<Aresta>> adj;
+    vector<string> labels;
 
     bool indiceValido(int i) const {
         return i >= 0 && i < (int)adj.size();
@@ -35,25 +35,20 @@ class GrafoLista : public Grafos {
     }
 
 public:
-    using Grafos::bfs;
-    using Grafos::dfs;
-
     GrafoLista(bool dir=false, bool pond=false) {
         this->isDirecionado = dir;
         this->isPonderado   = pond;
     }
 
-    // -------- VÉRTICES --------
     bool adicionarVertice(string label) override {
         labels.push_back(std::move(label));
-        adj.emplace_back(); // nova lista para o novo vértice
+        adj.emplace_back();
         return true;
     }
 
     bool removerVertice(int index) override {
         if (!indiceValido(index)) return false;
 
-        // remove arestas que chegam em 'index'
         for (int u = 0; u < (int)adj.size(); ++u) {
             if (u == index) continue;
             auto& lu = adj[u];
@@ -62,10 +57,8 @@ public:
                 lu.end());
         }
 
-        // remove as arestas que saem de 'index' e o próprio vértice
         adj.erase(adj.begin() + index);
 
-        // reindexa destinos > index
         for (auto& lu : adj) {
             for (auto& a : lu) if (a.destino > index) a.destino -= 1;
         }
@@ -79,19 +72,18 @@ public:
         return labels[index];
     }
 
-    // -------- ARESTAS --------
+    int numeroVertices() const override { return static_cast<int>(adj.size()); }
+
     bool adicionarAresta(int origem, int destino, float peso = 1.0) override {
         if (!indiceValido(origem) || !indiceValido(destino)) return false;
         float w = this->isPonderado ? (float)peso : 1.0f;
 
-        // cria/atualiza origem->destino
         {
             auto it = findAresta(origem, destino);
             if (it != adj[origem].end()) it->peso = w;
             else adj[origem].emplace_back(destino, w);
         }
 
-        // se não-direcionado, espelha
         if (!this->isDirecionado) {
             auto it = findAresta(destino, origem);
             if (it != adj[destino].end()) it->peso = w;
@@ -139,7 +131,6 @@ public:
         return vs;
     }
 
-    // -------- IMPRESSÃO --------
     void imprimirGrafo() override {
         cout << (this->isDirecionado ? "GRAFO DIRECIONADO" : "GRAFO NAO-DIRECIONADO")
              << (this->isPonderado ? " PONDERADO\n" : " NAO-PONDERADO\n");
@@ -153,38 +144,6 @@ public:
             cout << "\n";
         }
         cout.flush();
-    }
-
-    // -------- BFS/DFS --------
-    void bfs(int source) override {
-        int n = (int)adj.size();
-        if (source < 0 || source >= n) { cout << "BFS: (fonte invalida)\n"; return; }
-        vector<bool> vis(n,false);
-        queue<int> q;
-        cout << "BFS: ";
-        vis[source]=true; q.push(source);
-        while(!q.empty()){
-            int u=q.front(); q.pop();
-            cout << labelVertice(u) << " ";
-            for (auto& a: adj[u]) if(!vis[a.destino]){ vis[a.destino]=true; q.push(a.destino); }
-        }
-        cout << "\n";
-    }
-
-    void dfs(int source) override {
-        int n = (int)adj.size();
-        if (source < 0 || source >= n) { cout << "DFS: (fonte invalida)\n"; return; }
-        vector<bool> vis(n,false);
-        cout << "DFS: ";
-        dfsVisit(source, vis);
-        cout << "\n";
-    }
-
-private:
-    void dfsVisit(int u, vector<bool>& vis){
-        vis[u]=true;
-        cout << labelVertice(u) << " ";
-        for (auto& a : adj[u]) if(!vis[a.destino]) dfsVisit(a.destino, vis);
     }
 };
 

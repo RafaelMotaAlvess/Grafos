@@ -11,8 +11,6 @@ class GrafoMatriz : public Grafos {
     vector<vector<float>> matrizAdjacencia;
     vector<string> labels;
 public:
-    using Grafos::bfs;
-    using Grafos::dfs;
     GrafoMatriz(bool isDirecionado = false, bool isPonderado = false) {
         this->isDirecionado = isDirecionado;
         this->isPonderado = isPonderado;
@@ -72,6 +70,8 @@ public:
         return this->labels.at(index);
     }
 
+    int numeroVertices() const override { return static_cast<int>(matrizAdjacencia.size()); }
+
     void imprimirGrafo() override {
         cout << "Matriz de Adjacência:" << endl;
 
@@ -129,54 +129,6 @@ public:
         }
 
         return vizinhos;
-    }
-
-    void bfs(int source) override {
-        int n = (int)matrizAdjacencia.size();
-        if (source < 0 || source >= n) {
-            cout << "BFS: (fonte inválida)" << endl;
-            return;
-        }
-        vector<bool> visitados(n, false);
-        queue<int> q;
-        cout << "BFS: ";
-        visitados[source] = true;
-        q.push(source);
-        while (!q.empty()) {
-            int u = q.front(); q.pop();
-            cout << this->labelVertice(u) << " ";
-            for (int v = 0; v < n; ++v) {
-                if (!visitados[v] && matrizAdjacencia[u][v] != 0.0f) {
-                    visitados[v] = true;
-                    q.push(v);
-                }
-            }
-        }
-        cout << endl;
-    }
-
-    void dfs(int source) override {
-        int n = (int)matrizAdjacencia.size();
-        if (source < 0 || source >= n) {
-            cout << "DFS: (fonte inválida)" << endl;
-            return;
-        }
-        vector<bool> visitados(n, false);
-        cout << "DFS: ";
-        dfsVisit(source, visitados);
-        cout << endl;
-    }
-
-private:
-    void dfsVisit(int u, vector<bool>& visitados) {
-        visitados[u] = true;
-        cout << this->labelVertice(u) << " ";
-        int n = (int)matrizAdjacencia.size();
-        for (int v = 0; v < n; ++v) {
-            if (!visitados[v] && matrizAdjacencia[u][v] != 0.0f) {
-                dfsVisit(v, visitados);
-            }
-        }
     }
 };
 
