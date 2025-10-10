@@ -34,22 +34,34 @@ public:
 
     void bfs(int source) {
         int n = numeroVertices();
+
         if (source < 0 || source >= n) {
             cout << "BFS: (fonte invalida)" << endl;
             return;
         }
+
         vector<bool> visitado(n, false);
         queue<int> q;
         cout << "BFS: ";
+
         visitado[source] = true;
         q.push(source);
+
         while (!q.empty()) {
-            int u = q.front(); q.pop();
+            int u = q.front();
+            q.pop();
+
+            // Imprime a vertice atual
             cout << labelVertice(u) << ' ';
+
+            // Para cada vizinho de u, se ainda não visitado, marca e enfileira
             vector<int> viz = retornarVizinhos(u);
-            for (size_t i = 0; i < viz.size(); ++i) {
+            for (int i = 0; i < viz.size(); ++i) {
                 int v = viz[i];
-                if (!visitado[v]) { visitado[v] = true; q.push(v); }
+                if (!visitado[v]) {
+                    visitado[v] = true;
+                    q.push(v);
+                }
             }
         }
         cout << '\n';
@@ -73,8 +85,8 @@ public:
 
     vector<float> dijkstra(int source) {
         int n = numeroVertices();
-
         const float INF = std::numeric_limits<float>::infinity();
+
         vector<float> dist(n, INF);
         vector<int>   pai(n, -1);
         vector<bool>  visitado(n, false);
@@ -84,6 +96,7 @@ public:
             return dist;
         }
 
+        // verifica se há arestas com peso negativo
         for (int u = 0; u < n; ++u) {
             vector<int> viz = retornarVizinhos(u);
             for (size_t i = 0; i < viz.size(); ++i) {
