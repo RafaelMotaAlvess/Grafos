@@ -9,7 +9,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
     int opcao;
-    string caminho = (argc >= 2 ? argv[1] : string("grafo_teste_grande.txt"));
+    string caminho = (argc >= 2 ? argv[1] : string("grafo_mst_teste.txt"));
 
     cout << "1-Matriz | 2-Lista" << endl;
     cin >> opcao;
@@ -20,15 +20,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    // cout << "==========================" << endl;
-    // grafo->imprimirGrafo();
-
-    cout << "==========================" << endl;
-    cout << "Coloracao de Grafos" << endl;
-    cout << "==========================" << endl;
-    cout << endl;
-
-    auto imprimirResultado = [&](const Grafos::ResultadoColoracao& r) {
+    auto imprimirColoracao = [&](const Grafos::ResultadoColoracao& r) {
         cout << r.descricao << endl;
         if (!r.sucesso) {
             cout << "  Resultado indisponivel." << endl;
@@ -48,14 +40,69 @@ int main(int argc, char** argv) {
         }
     };
 
-    auto resForca = grafo->coloracaoForcaBruta();
-    imprimirResultado(resForca);
-    auto resGulosa = grafo->coloracaoGulosaSimples();
-    imprimirResultado(resGulosa);
-    auto resWelsh = grafo->coloracaoWelshPowell();
-    imprimirResultado(resWelsh);
-    auto resDSatur = grafo->coloracaoDSatur();
-    imprimirResultado(resDSatur);
+    auto imprimirArvore = [&](const Grafos::ResultadoArvoreMinima& r) {
+        cout << r.descricao << endl;
+        if (!r.sucesso) {
+            cout << "  Resultado indisponivel." << endl;
+            return;
+        }
+        cout << fixed << setprecision(4);
+        cout << "  Tempo: " << r.tempoMs << " ms" << endl;
+        cout << "  Soma dos pesos: " << r.somaPesos << endl;
+        cout << defaultfloat << setprecision(6);
+
+        int n = grafo->numeroVertices();
+        if (n > 0 && n < 10 && r.arestas.size() == static_cast<size_t>(n - 1)) {
+            for (const auto& aresta : r.arestas) {
+                int u = aresta.first;
+                int v = aresta.second;
+                cout << "    " << grafo->labelVertice(u)
+                     << " - " << grafo->labelVertice(v) << endl;
+            }
+        }
+    };
+
+    cout << "==========================" << endl;
+    cout << "Selecione o tipo de algoritmo" << endl;
+    cout << "1 - Coloracao de Grafos" << endl;
+    cout << "2 - Arvore Geradora Minima" << endl;
+    int modo = 0;
+    cin >> modo;
+    cout << endl;
+
+    switch (modo) {
+    case 1: {
+        cout << "==========================" << endl;
+        cout << "Coloracao de Grafos" << endl;
+        cout << "==========================" << endl;
+        cout << endl;
+
+        auto resForca = grafo->coloracaoForcaBruta();
+        imprimirColoracao(resForca);
+        auto resGulosa = grafo->coloracaoGulosaSimples();
+        imprimirColoracao(resGulosa);
+        auto resWelsh = grafo->coloracaoWelshPowell();
+        imprimirColoracao(resWelsh);
+        auto resDSatur = grafo->coloracaoDSatur();
+        imprimirColoracao(resDSatur);
+        break;
+    }
+    case 2: {
+        cout << "==========================" << endl;
+        cout << "Arvore Geradora Minima" << endl;
+        cout << "==========================" << endl;
+        cout << endl;
+
+        auto resPrim = grafo->arvoreGeradoraPrim();
+        imprimirArvore(resPrim);
+        auto resKruskal = grafo->arvoreGeradoraKruskal();
+        imprimirArvore(resKruskal);
+        break;
+    }
+    default:
+        cout << "Opcao invalida." << endl;
+        break;
+    }
 
     return 0;
 }

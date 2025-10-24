@@ -12,6 +12,7 @@
 #include <chrono>
 #include <numeric>
 #include <unordered_set>
+#include <utility>
 
 using namespace std;
 
@@ -25,6 +26,14 @@ public:
     struct ResultadoColoracao {
         vector<int> cores;
         int numeroCores = 0;
+        double tempoMs = 0.0;
+        bool sucesso = false;
+        string descricao;
+    };
+
+    struct ResultadoArvoreMinima {
+        vector<pair<int,int>> arestas;
+        double somaPesos = 0.0;
         double tempoMs = 0.0;
         bool sucesso = false;
         string descricao;
@@ -361,6 +370,141 @@ public:
             resultado.numeroCores = max(resultado.numeroCores, cor + 1);
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
         resultado.sucesso = true;
+        return resultado;
+    }
+
+    ResultadoArvoreMinima arvoreGeradoraPrim() {
+        ResultadoArvoreMinima resultado;
+        resultado.descricao = "Prim";
+
+        if (isDirecionado) {
+            resultado.descricao += " (nao suportado para grafos direcionados)";
+            return resultado;
+        }
+
+        int n = numeroVertices();
+        if (n == 0) {
+            resultado.sucesso = true;
+            return resultado;
+        }
+
+        auto inicio = chrono::steady_clock::now();
+        vector<bool> naArvore(n, false);
+        naArvore[0] = true;
+        int verticesNaArvore = 1;
+
+        while (verticesNaArvore < n) {
+            float melhorPeso = numeric_limits<float>::infinity();
+            int melhorU = -1;
+            int melhorV = -1;
+
+            for (int u = 0; u < n; ++u) {
+                if (!naArvore[u]) continue;
+                vector<int> vizinhos = retornarVizinhos(u);
+                for (int v : vizinhos) {
+                    if (naArvore[v]) continue;
+                    float peso = pesoAresta(u, v);
+                    if (std::isnan(peso)) peso = 1.0f;
+                    if (peso < melhorPeso) {
+                        melhorPeso = peso;
+                        melhorU = u;
+                        melhorV = v;
+                    }
+                }
+            }
+
+            if (melhorU == -1 || melhorV == -1) break;
+
+            naArvore[melhorV] = true;
+            verticesNaArvore += 1;
+
+            resultado.arestas.emplace_back(melhorU, melhorV);
+            resultado.somaPesos += static_cast<double>(melhorPeso);
+        }
+        auto fim = chrono::steady_clock::now();
+
+        resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
+        bool todos = (verticesNaArvore == n);
+        resultado.sucesso = todos;
+        if (!todos) {
+            resultado.descricao += " (falhou: grafo desconexo)";
+        }
+        return resultado;
+    }
+
+    ResultadoArvoreMinima arvoreGeradoraKruskal() {
+        ResultadoArvoreMinima resultado;
+        resultado.descricao = "Kruskal";
+
+        if (isDirecionado) {
+            resultado.descricao += " (nao suportado para grafos direcionados)";
+            return resultado;
+        }
+
+        int n = numeroVertices();
+        if (n == 0) {
+            resultado.sucesso = true;
+            return resultado;
+        }
+
+        struct ArestaKruskal {
+            int u;
+            int v;
+            float peso;
+        };
+
+        vector<ArestaKruskal> arestas;
+        arestas.reserve(n * 2);
+        for (int u = 0; u < n; ++u) {
+            vector<int> vizinhos = retornarVizinhos(u);
+            for (int v : vizinhos) {
+                if (!isDirecionado && v <= u) continue;
+                float peso = pesoAresta(u, v);
+                if (std::isnan(peso)) peso = 1.0f;
+                arestas.push_back({u, v, peso});
+            }
+        }
+
+        sort(arestas.begin(), arestas.end(), [](const ArestaKruskal& a, const ArestaKruskal& b){
+            if (a.peso != b.peso) return a.peso < b.peso;
+            if (a.u != b.u) return a.u < b.u;
+            return a.v < b.v;
+        });
+
+        vector<int> componente(n);
+        iota(componente.begin(), componente.end(), 0);
+
+        function<int(int)> encontrar = [&](int x) {
+            while (componente[x] != x) {
+                x = componente[x];
+            }
+            return x;
+        };
+
+        auto unir = [&](int x, int y) {
+            int raizX = encontrar(x);
+            int raizY = encontrar(y);
+            if (raizX == raizY) return false;
+            componente[raizY] = raizX;
+            return true;
+        };
+
+        auto inicio = chrono::steady_clock::now();
+        for (const auto& e : arestas) {
+            if (unir(e.u, e.v)) {
+                resultado.arestas.emplace_back(e.u, e.v);
+                resultado.somaPesos += static_cast<double>(e.peso);
+                if (resultado.arestas.size() == static_cast<size_t>(n - 1))
+                    break;
+            }
+        }
+        auto fim = chrono::steady_clock::now();
+
+        resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
+        resultado.sucesso = (resultado.arestas.size() == static_cast<size_t>(n - 1));
+        if (!resultado.sucesso) {
+            resultado.descricao += " (falhou: grafo desconexo)";
+        }
         return resultado;
     }
 
