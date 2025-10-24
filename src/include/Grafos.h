@@ -172,9 +172,16 @@ public:
 
     ResultadoColoracao coloracaoForcaBruta() {
         ResultadoColoracao resultado;
-        resultado.descricao = "Forca Bruta";
 
         int n = numeroVertices();
+        if (n >= 10) {
+            resultado.descricao = string("Forca Bruta com mais de 10 vertices (n = ")
+                                   + to_string(n) + " vertices)";
+            return resultado;
+        }
+
+        resultado.descricao = "Forca Bruta";
+
         if (n == 0) {
             resultado.sucesso = true;
             return resultado;

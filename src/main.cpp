@@ -25,6 +25,8 @@ int main(int argc, char** argv) {
 
     cout << "==========================" << endl;
     cout << "Coloracao de Grafos" << endl;
+    cout << "==========================" << endl;
+    cout << endl;
 
     auto imprimirResultado = [&](const Grafos::ResultadoColoracao& r) {
         cout << r.descricao << endl;
@@ -46,10 +48,10 @@ int main(int argc, char** argv) {
         }
     };
 
-    // auto resForca = grafo->coloracaoForcaBruta();
-    // imprimirResultado(resForca);
-    // auto resGulosa = grafo->coloracaoGulosaSimples();
-    // imprimirResultado(resGulosa);
+    auto resForca = grafo->coloracaoForcaBruta();
+    imprimirResultado(resForca);
+    auto resGulosa = grafo->coloracaoGulosaSimples();
+    imprimirResultado(resGulosa);
     auto resWelsh = grafo->coloracaoWelshPowell();
     imprimirResultado(resWelsh);
     auto resDSatur = grafo->coloracaoDSatur();
