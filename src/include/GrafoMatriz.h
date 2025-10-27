@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <sstream>
 #include <queue>
+#include <limits>
+#include <cmath>
 
 class GrafoMatriz : public Grafos {
     vector<vector<float>> matrizAdjacencia;
@@ -16,26 +18,28 @@ public:
         this->isPonderado = isPonderado;
     }
 
+    float valorSemAresta() const {
+        return std::numeric_limits<float>::quiet_NaN();
+    }
+
     bool adicionarVertice(string label) override {
         labels.push_back(label);
         int novoTamanho = matrizAdjacencia.size() + 1;
 
-        // Adiciona uma nova linha com zeros
-        matrizAdjacencia.push_back(vector<float>(novoTamanho, 0.0));
+        // Adiciona uma nova linha sem arestas
+        matrizAdjacencia.push_back(vector<float>(novoTamanho, valorSemAresta()));
 
-        // Adiciona uma nova coluna com zeros em todas as linhas existentes
+        // Adiciona uma nova coluna sem arestas em todas as linhas existentes
         for (int i = 0; i < novoTamanho - 1; i++) {
-            matrizAdjacencia[i].push_back(0.0);
+            matrizAdjacencia[i].push_back(valorSemAresta());
         }
 
         return true;
     }
 
     bool adicionarAresta(int origem, int destino, float peso = 1.0) override {
-        if(this->isDirecionado){
-            matrizAdjacencia[origem][destino] = peso;
-        } else {
-            matrizAdjacencia[origem][destino] = peso;
+        matrizAdjacencia[origem][destino] = peso;
+        if(!this->isDirecionado){
             matrizAdjacencia[destino][origem] = peso;
         }
         return true;
@@ -57,11 +61,9 @@ public:
     }
 
     bool removerAresta(int origem, int destino) override {
-        if(this->isDirecionado){
-            matrizAdjacencia[origem][destino] = 0.0;
-        } else {
-            matrizAdjacencia[origem][destino] = 0.0;
-            matrizAdjacencia[destino][origem] = 0.0;
+        matrizAdjacencia[origem][destino] = valorSemAresta();
+        if(!this->isDirecionado){
+            matrizAdjacencia[destino][origem] = valorSemAresta();
         }
         return true;
     }
@@ -98,18 +100,17 @@ public:
         for (int i = 0; i < n; i++) {
             cout << setw(largura) << labels[i];
             for (int j = 0; j < n; j++) {
-                cout << setw(largura) << matrizAdjacencia[i][j];
+                float valor = matrizAdjacencia[i][j];
+                if (std::isnan(valor)) valor = 0.0f;
+                cout << setw(largura) << valor;
             }
             cout << endl;
         }
     }
 
     bool existeAresta(int origem, int destino) override {
-        if(matrizAdjacencia[origem][destino] != 0.0){
-            return true;
-        }
-
-        return false;
+        float valor = matrizAdjacencia[origem][destino];
+        return !std::isnan(valor);
     }
 
     float pesoAresta(int origem, int destino) override {
@@ -123,7 +124,7 @@ public:
         int n = matrizAdjacencia.size();
 
         for (int j = 0; j < n; j++) {
-            if (matrizAdjacencia[vertice][j] != 0.0) {
+            if (!std::isnan(matrizAdjacencia[vertice][j])) {
                 vizinhos.push_back(j);
             }
         }
