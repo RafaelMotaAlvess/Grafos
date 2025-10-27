@@ -181,48 +181,48 @@ public:
 
     ResultadoColoracao coloracaoForcaBruta() {
         ResultadoColoracao resultado;
-
-        int n = numeroVertices();
-        if (n >= 10) {
+        int totalVertices = numeroVertices();
+        if (totalVertices >= 10) {
             resultado.descricao = string("Forca Bruta com mais de 10 vertices (n = ")
-                                   + to_string(n) + " vertices)";
+                                   + to_string(totalVertices) + " vertices)";
             return resultado;
         }
 
         resultado.descricao = "Forca Bruta";
 
-        if (n == 0) {
+        if (totalVertices == 0) {
             resultado.sucesso = true;
             return resultado;
         }
 
         auto inicio = chrono::steady_clock::now();
-        vector<int> cores(n, -1);
-        vector<vector<int>> vizinhos = construirVizinhosColoracao();
 
-        function<bool(int,int)> atribui = [&](int v, int maxCor){
-            if (v == n) return true;
-            for (int cor = 0; cor < maxCor; ++cor) {
-                bool temConflito = false;
-                for (int viz : vizinhos[v]) {
-                    if (cores[viz] == cor) { temConflito = true; break; }
+        vector<int> corPorVertice(totalVertices, -1);
+        vector<vector<int>> vizinhosPorVertice = construirVizinhosColoracao();
+
+        function<bool(int,int)> tentarAtribuirCor = [&](int indiceVertice, int limiteCores){
+            if (indiceVertice == totalVertices) return true;
+            for (int corCandidata = 0; corCandidata < limiteCores; ++corCandidata) {
+                bool existeConflito = false;
+                for (int vizinho : vizinhosPorVertice[indiceVertice]) {
+                    if (corPorVertice[vizinho] == corCandidata) { existeConflito = true; break; }
                 }
-                if (!temConflito) {
-                    cores[v] = cor;
-                    if (atribui(v + 1, maxCor)) return true;
-                    cores[v] = -1;
+                if (!existeConflito) {
+                    corPorVertice[indiceVertice] = corCandidata;
+                    if (tentarAtribuirCor(indiceVertice + 1, limiteCores)) return true;
+                    corPorVertice[indiceVertice] = -1;
                 }
             }
             return false;
         };
 
-        int minCoresInicial = (n <= 1 ? 1 : 2);
-        for (int k = minCoresInicial; k <= n; ++k) {
-            fill(cores.begin(), cores.end(), -1);
-            if (atribui(0, k)) {
-                resultado.cores = cores;
+        int quantidadeCoresMinima = (totalVertices <= 1 ? 1 : 2);
+        for (int totalCores = quantidadeCoresMinima; totalCores <= totalVertices; ++totalCores) {
+            fill(corPorVertice.begin(), corPorVertice.end(), -1);
+            if (tentarAtribuirCor(0, totalCores)) {
+                resultado.cores = corPorVertice;
                 resultado.numeroCores = 0;
-                for (int cor : cores)
+                for (int cor : corPorVertice)
                     resultado.numeroCores = max(resultado.numeroCores, cor + 1);
                 resultado.sucesso = true;
                 break;
@@ -238,26 +238,26 @@ public:
         ResultadoColoracao resultado;
         resultado.descricao = "Heuristica Gulosa Simples";
 
-        int n = numeroVertices();
-        vector<int> cores(n, -1);
-        vector<vector<int>> vizinhos = construirVizinhosColoracao();
+        int totalVertices = numeroVertices();
+        vector<int> corPorVertice(totalVertices, -1);
+        vector<vector<int>> vizinhosPorVertice = construirVizinhosColoracao();
 
         auto inicio = chrono::steady_clock::now();
-        for (int v = 0; v < n; ++v) {
-            vector<bool> usadas(n, false);
-            for (int viz : vizinhos[v]) {
-                int corViz = (viz >= 0 && viz < n ? cores[viz] : -1);
-                if (corViz >= 0) usadas[corViz] = true;
+        for (int indiceVertice = 0; indiceVertice < totalVertices; ++indiceVertice) {
+            vector<bool> corUtilizada(totalVertices, false);
+            for (int vizinho : vizinhosPorVertice[indiceVertice]) {
+                int corVizinho = (vizinho >= 0 && vizinho < totalVertices ? corPorVertice[vizinho] : -1);
+                if (corVizinho >= 0) corUtilizada[corVizinho] = true;
             }
-            int cor = 0;
-            while (cor < n && usadas[cor]) ++cor;
-            cores[v] = cor;
+            int corCandidata = 0;
+            while (corCandidata < totalVertices && corUtilizada[corCandidata]) ++corCandidata;
+            corPorVertice[indiceVertice] = corCandidata;
         }
         auto fim = chrono::steady_clock::now();
 
-        resultado.cores = cores;
+        resultado.cores = corPorVertice;
         resultado.numeroCores = 0;
-        for (int cor : cores)
+        for (int cor : corPorVertice)
             resultado.numeroCores = max(resultado.numeroCores, cor + 1);
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
         resultado.sucesso = true;
@@ -268,40 +268,40 @@ public:
         ResultadoColoracao resultado;
         resultado.descricao = "Welsh-Powell";
 
-        int n = numeroVertices();
-        vector<int> cores(n, -1);
-        vector<int> ordem(n);
-        vector<int> graus(n, 0);
+        int totalVertices = numeroVertices();
+        vector<int> corPorVertice(totalVertices, -1);
+        vector<int> ordemVertices(totalVertices);
+        vector<int> grauPorVertice(totalVertices, 0);
 
-        vector<vector<int>> vizinhos = construirVizinhosColoracao();
-        for (int v = 0; v < n; ++v) {
-            graus[v] = static_cast<int>(vizinhos[v].size());
+        vector<vector<int>> vizinhosPorVertice = construirVizinhosColoracao();
+        for (int indiceVertice = 0; indiceVertice < totalVertices; ++indiceVertice) {
+            grauPorVertice[indiceVertice] = static_cast<int>(vizinhosPorVertice[indiceVertice].size());
         }
 
-        iota(ordem.begin(), ordem.end(), 0);
-        sort(ordem.begin(), ordem.end(), [&](int a, int b){
-            if (graus[a] != graus[b]) return graus[a] > graus[b];
+        iota(ordemVertices.begin(), ordemVertices.end(), 0);
+        sort(ordemVertices.begin(), ordemVertices.end(), [&](int a, int b){
+            if (grauPorVertice[a] != grauPorVertice[b]) return grauPorVertice[a] > grauPorVertice[b];
             return a < b;
         });
 
         auto inicio = chrono::steady_clock::now();
-        vector<bool> usadas(n, false);
+        vector<bool> corUtilizada(totalVertices, false);
 
-        for (int v : ordem) {
-            fill(usadas.begin(), usadas.end(), false);
-            for (int viz : vizinhos[v]) {
-                int corViz = cores[viz];
-                if (corViz >= 0 && corViz < n) usadas[corViz] = true;
+        for (int indiceVertice : ordemVertices) {
+            fill(corUtilizada.begin(), corUtilizada.end(), false);
+            for (int vizinho : vizinhosPorVertice[indiceVertice]) {
+                int corVizinho = corPorVertice[vizinho];
+                if (corVizinho >= 0 && corVizinho < totalVertices) corUtilizada[corVizinho] = true;
             }
-            int cor = 0;
-            while (cor < n && usadas[cor]) ++cor;
-            cores[v] = cor;
+            int corCandidata = 0;
+            while (corCandidata < totalVertices && corUtilizada[corCandidata]) ++corCandidata;
+            corPorVertice[indiceVertice] = corCandidata;
         }
         auto fim = chrono::steady_clock::now();
 
-        resultado.cores = cores;
+        resultado.cores = corPorVertice;
         resultado.numeroCores = 0;
-        for (int cor : cores)
+        for (int cor : corPorVertice)
             resultado.numeroCores = max(resultado.numeroCores, cor + 1);
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
         resultado.sucesso = true;
@@ -312,61 +312,62 @@ public:
         ResultadoColoracao resultado;
         resultado.descricao = "DSATUR";
 
-        int n = numeroVertices();
-        vector<int> cores(n, -1);
-        vector<int> graus(n, 0);
-        vector<vector<int>> vizinhos = construirVizinhosColoracao();
+        int totalVertices = numeroVertices();
+        vector<int> corPorVertice(totalVertices, -1);
+        vector<int> grauPorVertice(totalVertices, 0);
+        vector<vector<int>> vizinhosPorVertice = construirVizinhosColoracao();
 
-        for (int v = 0; v < n; ++v) {
-            graus[v] = static_cast<int>(vizinhos[v].size());
+        for (int indiceVertice = 0; indiceVertice < totalVertices; ++indiceVertice) {
+            grauPorVertice[indiceVertice] = static_cast<int>(vizinhosPorVertice[indiceVertice].size());
         }
 
-        vector<unordered_set<int>> coresAdj(n);
-        vector<int> saturacao(n, 0);
-        vector<bool> colorido(n, false);
+        vector<unordered_set<int>> coresAdjacentes(totalVertices);
+        vector<int> grauSaturacao(totalVertices, 0);
+        vector<bool> verticeColorido(totalVertices, false);
 
         auto inicio = chrono::steady_clock::now();
 
-        for (int passo = 0; passo < n; ++passo) {
-            int escolhido = -1;
-            int melhorSat = -1;
+        for (int passo = 0; passo < totalVertices; ++passo) {
+            int verticeEscolhido = -1;
+            int melhorSaturacao = -1;
             int melhorGrau = -1;
 
-            for (int v = 0; v < n; ++v) {
-                if (colorido[v]) continue;
-                int sat = saturacao[v];
-                if (sat > melhorSat || (sat == melhorSat && graus[v] > melhorGrau)) {
-                    melhorSat = sat;
-                    melhorGrau = graus[v];
-                    escolhido = v;
+            for (int indiceVertice = 0; indiceVertice < totalVertices; ++indiceVertice) {
+                if (verticeColorido[indiceVertice]) continue;
+                int saturacaoAtual = grauSaturacao[indiceVertice];
+                if (saturacaoAtual > melhorSaturacao ||
+                    (saturacaoAtual == melhorSaturacao && grauPorVertice[indiceVertice] > melhorGrau)) {
+                    melhorSaturacao = saturacaoAtual;
+                    melhorGrau = grauPorVertice[indiceVertice];
+                    verticeEscolhido = indiceVertice;
                 }
             }
 
-            if (escolhido == -1) break;
+            if (verticeEscolhido == -1) break;
 
-            vector<bool> usadas(n, false);
-            for (int viz : vizinhos[escolhido]) {
-                int corViz = cores[viz];
-                if (corViz >= 0 && corViz < n) usadas[corViz] = true;
+            vector<bool> corUtilizada(totalVertices, false);
+            for (int vizinho : vizinhosPorVertice[verticeEscolhido]) {
+                int corVizinho = corPorVertice[vizinho];
+                if (corVizinho >= 0 && corVizinho < totalVertices) corUtilizada[corVizinho] = true;
             }
-            int cor = 0;
-            while (cor < n && usadas[cor]) ++cor;
-            cores[escolhido] = cor;
-            colorido[escolhido] = true;
+            int corCandidata = 0;
+            while (corCandidata < totalVertices && corUtilizada[corCandidata]) ++corCandidata;
+            corPorVertice[verticeEscolhido] = corCandidata;
+            verticeColorido[verticeEscolhido] = true;
 
-            for (int viz : vizinhos[escolhido]) {
-                if (colorido[viz]) continue;
-                if (coresAdj[viz].insert(cor).second) {
-                    saturacao[viz] = static_cast<int>(coresAdj[viz].size());
+            for (int vizinho : vizinhosPorVertice[verticeEscolhido]) {
+                if (verticeColorido[vizinho]) continue;
+                if (coresAdjacentes[vizinho].insert(corCandidata).second) {
+                    grauSaturacao[vizinho] = static_cast<int>(coresAdjacentes[vizinho].size());
                 }
             }
         }
 
         auto fim = chrono::steady_clock::now();
 
-        resultado.cores = cores;
+        resultado.cores = corPorVertice;
         resultado.numeroCores = 0;
-        for (int cor : cores)
+        for (int cor : corPorVertice)
             resultado.numeroCores = max(resultado.numeroCores, cor + 1);
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
         resultado.sucesso = true;
@@ -382,27 +383,28 @@ public:
             return resultado;
         }
 
-        int n = numeroVertices();
-        if (n == 0) {
+        int totalVertices = numeroVertices();
+        if (totalVertices == 0) {
             resultado.sucesso = true;
             return resultado;
         }
 
         auto inicio = chrono::steady_clock::now();
-        vector<bool> naArvore(n, false);
-        naArvore[0] = true;
-        int verticesNaArvore = 1;
+        vector<bool> verticeJaInserido(totalVertices, false);
+        verticeJaInserido[0] = true;
+        int quantidadeInserida = 1;
 
-        while (verticesNaArvore < n) {
+        while (quantidadeInserida < totalVertices) {
+            // Busca a menor aresta que liga a árvore atual a qualquer vértice fora dela.
             float melhorPeso = numeric_limits<float>::infinity();
             int melhorU = -1;
             int melhorV = -1;
 
-            for (int u = 0; u < n; ++u) {
-                if (!naArvore[u]) continue;
+            for (int u = 0; u < totalVertices; ++u) {
+                if (!verticeJaInserido[u]) continue;
                 vector<int> vizinhos = retornarVizinhos(u);
                 for (int v : vizinhos) {
-                    if (naArvore[v]) continue;
+                    if (verticeJaInserido[v]) continue;
                     float peso = pesoAresta(u, v);
                     if (std::isnan(peso)) peso = 1.0f;
                     if (peso < melhorPeso) {
@@ -415,8 +417,8 @@ public:
 
             if (melhorU == -1 || melhorV == -1) break;
 
-            naArvore[melhorV] = true;
-            verticesNaArvore += 1;
+            verticeJaInserido[melhorV] = true;
+            quantidadeInserida += 1;
 
             resultado.arestas.emplace_back(melhorU, melhorV);
             resultado.somaPesos += static_cast<double>(melhorPeso);
@@ -424,7 +426,7 @@ public:
         auto fim = chrono::steady_clock::now();
 
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
-        bool todos = (verticesNaArvore == n);
+        bool todos = (quantidadeInserida == totalVertices);
         resultado.sucesso = todos;
         if (!todos) {
             resultado.descricao += " (falhou: grafo desconexo)";
@@ -441,8 +443,8 @@ public:
             return resultado;
         }
 
-        int n = numeroVertices();
-        if (n == 0) {
+        int totalVertices = numeroVertices();
+        if (totalVertices == 0) {
             resultado.sucesso = true;
             return resultado;
         }
@@ -454,14 +456,14 @@ public:
         };
 
         vector<ArestaKruskal> arestas;
-        arestas.reserve(n * 2);
-        for (int u = 0; u < n; ++u) {
-            vector<int> vizinhos = retornarVizinhos(u);
-            for (int v : vizinhos) {
-                if (!isDirecionado && v <= u) continue;
-                float peso = pesoAresta(u, v);
-                if (std::isnan(peso)) peso = 1.0f;
-                arestas.push_back({u, v, peso});
+        arestas.reserve(totalVertices * 2);
+        for (int origem = 0; origem < totalVertices; ++origem) {
+            vector<int> vizinhos = retornarVizinhos(origem);
+            for (int destino : vizinhos) {
+                if (!isDirecionado && destino <= origem) continue;
+                float pesoArestaAtual = pesoAresta(origem, destino);
+                if (std::isnan(pesoArestaAtual)) pesoArestaAtual = 1.0f;
+                arestas.push_back({origem, destino, pesoArestaAtual});
             }
         }
 
@@ -471,37 +473,37 @@ public:
             return a.v < b.v;
         });
 
-        vector<int> componente(n);
-        iota(componente.begin(), componente.end(), 0);
+        vector<int> representante(totalVertices);
+        iota(representante.begin(), representante.end(), 0);
 
-        function<int(int)> encontrar = [&](int x) {
-            while (componente[x] != x) {
-                x = componente[x];
+        function<int(int)> encontrarRepresentante = [&](int vertice) {
+            while (representante[vertice] != vertice) {
+                vertice = representante[vertice];
             }
-            return x;
+            return vertice;
         };
 
-        auto unir = [&](int x, int y) {
-            int raizX = encontrar(x);
-            int raizY = encontrar(y);
-            if (raizX == raizY) return false;
-            componente[raizY] = raizX;
+        auto unirComponentes = [&](int verticeA, int verticeB) {
+            int raizA = encontrarRepresentante(verticeA);
+            int raizB = encontrarRepresentante(verticeB);
+            if (raizA == raizB) return false;
+            representante[raizB] = raizA;
             return true;
         };
 
         auto inicio = chrono::steady_clock::now();
-        for (const auto& e : arestas) {
-            if (unir(e.u, e.v)) {
-                resultado.arestas.emplace_back(e.u, e.v);
-                resultado.somaPesos += static_cast<double>(e.peso);
-                if (resultado.arestas.size() == static_cast<size_t>(n - 1))
+        for (const auto& aresta : arestas) {
+            if (unirComponentes(aresta.u, aresta.v)) {
+                resultado.arestas.emplace_back(aresta.u, aresta.v);
+                resultado.somaPesos += static_cast<double>(aresta.peso);
+                if (resultado.arestas.size() == static_cast<size_t>(totalVertices - 1))
                     break;
             }
         }
         auto fim = chrono::steady_clock::now();
 
         resultado.tempoMs = chrono::duration<double, std::milli>(fim - inicio).count();
-        resultado.sucesso = (resultado.arestas.size() == static_cast<size_t>(n - 1));
+        resultado.sucesso = (resultado.arestas.size() == static_cast<size_t>(totalVertices - 1));
         if (!resultado.sucesso) {
             resultado.descricao += " (falhou: grafo desconexo)";
         }
