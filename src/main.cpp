@@ -2,16 +2,101 @@
 #include <string>
 #include <memory>
 #include <iomanip>
+#include <vector>
+#include <limits>
+#include <algorithm>
+#include <functional>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #include "./include/InicializadorGrafo.h"
 
 using namespace std;
 
+auto listarArquivosTxt = [](const string& diretorioRaiz) {
+    vector<string> arquivos;
+    function<void(const string&)> explorar = [&](const string& dirAtual) {
+        DIR* dir = opendir(dirAtual.c_str());
+        if (!dir) return;
+        struct dirent* entry = nullptr;
+        while ((entry = readdir(dir)) != nullptr) {
+            string nome = entry->d_name;
+            if (nome == "." || nome == "..") continue;
+            string caminho = dirAtual + "/" + nome;
+
+            struct stat info {};
+            if (stat(caminho.c_str(), &info) != 0) {
+                continue;
+            }
+
+            if (S_ISDIR(info.st_mode)) {
+                explorar(caminho);
+            } else if (S_ISREG(info.st_mode)) {
+                if (nome.size() >= 4 &&
+                    nome.substr(nome.size() - 4) == ".txt") {
+                    arquivos.push_back(caminho);
+                }
+            }
+        }
+        closedir(dir);
+    };
+
+    explorar(diretorioRaiz);
+    sort(arquivos.begin(), arquivos.end());
+    return arquivos;
+};
+
 int main(int argc, char** argv) {
-    int opcao;
-    string caminho = (argc >= 2 ? argv[1] : string("grafo_mst_teste.txt"));
+    string caminho;
+    const string caminhoPadrao = "grafo_teste_grande.txt";
+
+    if (argc >= 2) {
+        caminho = argv[1];
+    } else {
+        const string pastaExemplos = "grafos_exemplos";
+        vector<string> arquivosTxt = listarArquivosTxt(pastaExemplos);
+
+        cout << "==========================" << endl;
+        cout << "Selecione o arquivo de grafo" << endl;
+        if (arquivosTxt.empty()) {
+            cout << "(Nenhum arquivo .txt encontrado em " << pastaExemplos << ")" << endl;
+        } else {
+            for (size_t i = 0; i < arquivosTxt.size(); ++i) {
+                cout << (i + 1) << " - " << arquivosTxt[i] << endl;
+            }
+        }
+        cout << "0 - Informar caminho manualmente" << endl;
+        cout << "==========================" << endl;
+
+        int escolhaArquivo = -1;
+        cin >> escolhaArquivo;
+
+        if (!cin) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            escolhaArquivo = -1;
+        }
+
+        if (escolhaArquivo == 0) {
+            cout << "Digite o caminho do arquivo: ";
+            cin >> caminho;
+        } else if (escolhaArquivo >= 1 &&
+                   static_cast<size_t>(escolhaArquivo) <= arquivosTxt.size()) {
+            caminho = arquivosTxt[escolhaArquivo - 1];
+        } else {
+            cout << "Opcao invalida. Usando arquivo padrao: "
+                 << caminhoPadrao << endl;
+            caminho = caminhoPadrao;
+        }
+    }
+
+    if (caminho.empty()) {
+        caminho = caminhoPadrao;
+    }
+    cout << "Arquivo selecionado: " << caminho << endl;
 
     cout << "1-Matriz | 2-Lista" << endl;
+    int opcao = 0;
     cin >> opcao;
 
     unique_ptr<Grafos> grafo = inicializarGrafo(caminho, (opcao == 1 ? 1 : 2));
