@@ -1,66 +1,3 @@
-# Trabalho M2 – Heurísticas de Coloração e Árvores Geradoras Mínimas
-
-## Alunos
-- Rafael Mota Alves
-- Nilson Andrade Neto
-
-## Descrição
-Este trabalho amplia o M1 adicionando a execução automatizada das heurísticas de coloração de grafos e dos algoritmos de árvore geradora mínima (AGM) sobre os conjuntos de instâncias fornecidos. O objetivo é produzir um relatório textual com tempo de execução e resultados (soma total para AGM e número de cores para coloração) sem incluir o algoritmo de força bruta.
-
-O projeto mantém a infraestrutura base de grafos (representações em lista e matriz) e introduz o utilitário `generate_report` que percorre todas as instâncias e grava um relatório pronto para ser copiado em um documento final.
-
-## Estrutura
-- `src/include/` – Interface `Grafos`, implementações `GrafoLista` e `GrafoMatriz`, leitor de grafos e inicializador.
-- `src/main.cpp` – Interface interativa original para experimentos pontuais.
-- `src/generate_report.cpp` – Ferramenta automatizada para o relatório do M2.
-- `relatorio_execucoes.txt` – Saída gerada pelo utilitário com os resultados solicitados.
-
-## Como Compilar
-Pré-requisito: compilador C++17 (`g++`).
-
-Compilar somente o relatório:
-```bash
-make generate_report
-```
-
-Compilar a aplicação interativa original:
-```bash
-make main
-```
-
-## Como Executar
-- Relatório automatizado (gera/atualiza `relatorio_execucoes.txt`):
-  ```bash
-  make run_report
-  ```
-- Aplicação interativa (opcional):
-  ```bash
-  make run
-  ```
-
-O relatório utiliza a representação por lista de adjacência (`tipo = 2`) para todas as instâncias.
-
-## Instâncias Utilizadas
-- Coloração: arquivos em `grafos_exemplos/grafos_coloridos/`
-  - `C4000-260-X.txt`
-  - `k33.txt`
-  - `k5.txt`
-  - `kquase5.txt`
-  - `r1000-234-234.txt`
-  - `r250-66-65.txt`
-- Árvores Geradoras Mínimas: arquivos em `grafos_exemplos/grafos_mst/`
-  - `1000vertices25%Arestas.txt`
-  - `500vertices100%Arestas.txt`
-  - `500vertices25%Arestas.txt`
-  - `500vertices50%Arestas.txt`
-  - `50vertices100%Arestas.txt`
-  - `50vertices25%Arestas.txt`
-  - `50vertices50%Arestas.txt`
-
-## Relatório de Execução
-O texto abaixo corresponde exatamente ao conteúdo de `relatorio_execucoes.txt` após a execução do utilitário:
-
-```text
 Executando "grafos_exemplos/grafos_coloridos/C4000-260-X.txt" utilizando "Heuristica Gulosa Simples"
   Tempo (ms): 122.5828
   Numero de cores: 402
@@ -190,10 +127,3 @@ Executando "grafos_exemplos/grafos_mst/50vertices50%Arestas.txt" utilizando "Kru
   Soma total (AGM): 2770.0000
 
 Relatorio salvo em relatorio_execucoes.txt
-```
-
-## Observações
-- O relatório não inclui a coloração por força bruta, conforme solicitado.
-- Os tempos foram coletados no mesmo ambiente de execução; pequenas variações podem ocorrer em outras máquinas.
-- Caso sejam realizados ajustes no código ou nas instâncias, reexecute `make run_report` para atualizar o arquivo de saída.
-
